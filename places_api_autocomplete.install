@@ -1,0 +1,6 @@
+<?php
+
+function places_api_autocomplete_schema() {
+  $schema['cache_places'] = drupal_get_schema_unprocessed('system', 'cache');
+  return $schema;
+}
