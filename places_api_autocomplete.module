@@ -29,7 +29,7 @@ function places_autocomplete($string = '') {
   if ($string) {
     $key = variable_get('places_api_autocomplete_key', NULL);
     $cacheObject = new GooglePlacesAutocompleteCacheDrupal();
-    $options = array();
+    $options = variable_get('places_api_options');
     $placesApi = new GooglePlacesAutocomplete($key, $cacheObject, $options);
     $result = $placesApi->search($string);
     foreach ($result as $place) {
@@ -44,27 +44,20 @@ function places_autocomplete($string = '') {
  * Implements hook_field_widget_info().
  */
 function places_api_autocomplete_field_widget_info() {
-  /**
-   * label: The human-readable name of the widget type.
-   * description: A short description for the widget type.
-   * field types: An array of field types the widget supports.
-   * settings: An array whose keys are the names of the settings available for the widget type, and whose values are the default values for those settings.
-   * behaviors: (optional) An array describing behaviors of the widget, with the following elements:
-   * multiple values: One of the following constants:
-   * FIELD_BEHAVIOR_DEFAULT: (default) If the widget allows the input of one single field value (most common case). The widget will be repeated for each value input.
-   * FIELD_BEHAVIOR_CUSTOM: If one single copy of the widget can receive several field values. Examples: checkboxes, multiple select, comma-separated textfield.
-   * default value: One of the following constants:
-   * FIELD_BEHAVIOR_DEFAULT: (default) If the widget accepts default values.
-   * FIELD_BEHAVIOR_NONE: if the widget does not support default values.
-   * weight: (optional) An integer to determine the weight of this widget relative to other widgets in the Field UI when selecting a widget for a given field instance.
-   */
-
   return array(
     'places_autocomplete' => array(
       'label' => 'Google Places Autocomplete',
       'description' => 'A text field with Google Places API Autocomplete',
       'field types' => array('text'),
-      'settings' => array('size' => 60),
+      'settings' => array(
+        'size' => 60,
+        'offset' => '',
+        'location' => '',
+        'radius' =>  '',
+        'language' => '',
+        'type' => '',
+        'components' => '',
+      ),
     ),
   );
 }
@@ -84,10 +77,51 @@ function places_api_autocomplete_field_widget_settings_form($field, $instance) {
       '#required' => TRUE,
       '#element_validate' => array('element_validate_integer_positive'),
     );
+
+    $documentation_link = 'https://developers.google.com/places/documentation/autocomplete#place_autocomplete_requests';
+    $places_api_options = variable_get('places_api_options');
+    $form['places_api_options'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Places API parameters'),
+      '#tree' => TRUE,
+      '#description' => 'Documentation about the paramenters, can be found <a target="_blank" href="' . $documentation_link . '">here</a>.',
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
+
+    $form['places_api_options']['offset'] = array(
+      '#type' => 'textfield',
+      '#title' => 'Offset',
+      '#default_value' => $settings['places_api_options']['offset'] ? $settings['places_api_options']['offset'] : $places_api_options['offset'],
+    );
+    $form['places_api_options']['location'] = array(
+      '#type' => 'textfield',
+      '#title' => 'Location',
+      '#default_value' => $settings['places_api_options']['location'] ? $settings['places_api_options']['location'] : $places_api_options['location'],
+    );
+    $form['places_api_options']['radius'] = array(
+      '#type' => 'textfield',
+      '#title' => 'Radius',
+      '#default_value' => $settings['places_api_options']['radius'] ? $settings['places_api_options']['radius'] : $places_api_options['radius'],
+    );
+    $form['places_api_options']['language'] = array(
+      '#type' => 'textfield',
+      '#title' => 'Language',
+      '#default_value' => $settings['places_api_options']['language'] ? $settings['places_api_options']['language'] : $places_api_options['language'],
+    );
+    $form['places_api_options']['types'] = array(
+      '#type' => 'textfield',
+      '#title' => 'Types',
+      '#default_value' => $settings['places_api_options']['types'] ? $settings['places_api_options']['types'] : $places_api_options['types'],
+    );
+    $form['places_api_options']['components'] = array(
+      '#type' => 'textfield',
+      '#title' => 'Components',
+      '#default_value' => $settings['places_api_options']['components'] ? $settings['places_api_options']['components'] : $places_api_options['components'],
+    );
   }
 
   return $form;
-
 }
 
 /**
