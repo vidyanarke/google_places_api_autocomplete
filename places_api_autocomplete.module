@@ -11,6 +11,14 @@ function places_api_autocomplete_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['places/autocomplete/%/%/%'] = array(
+    'title' => 'Places autocomplete',
+    'page callback' => 'places_autocomplete',
+    'page arguments' => array(2, 3, 4),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
   $items['admin/config/services/places'] = array(
     'title' => 'Google Places API',
     'description' => 'Configure Google Places API settings',
@@ -24,12 +32,18 @@ function places_api_autocomplete_menu() {
   return $items;
 }
 
-function places_autocomplete($string = '') {
+function places_autocomplete($field_name = 'global', $entity_type = NULL, $bundle = NULL, $string = '') {
   $matches = array();
   if ($string) {
     $key = variable_get('places_api_autocomplete_key', NULL);
     $cacheObject = new GooglePlacesAutocompleteCacheDrupal();
-    $options = variable_get('places_api_options');
+    if ($field_name == 'global'){
+      $options = variable_get('places_api_options');
+    }else{
+      // We grab parameter options from the field instance settings.
+      $instance = field_info_instance($entity_type, $field_name, $bundle);
+      $options = $instance['widget']['settings']['places_api_options'];
+    }
     $placesApi = new GooglePlacesAutocomplete($key, $cacheObject, $options);
     $result = $placesApi->search($string);
     foreach ($result as $place) {
@@ -135,7 +149,7 @@ function places_api_autocomplete_field_widget_form(&$form, &$form_state, $field,
     '#size' => $instance['widget']['settings']['size'],
     '#maxlength' => $field['settings']['max_length'],
     '#attributes' => array('class' => array('text-full')),
-    '#autocomplete_path' => 'places/autocomplete',
+    '#autocomplete_path' => 'places/autocomplete/' . $instance['field_name'] . '/' . $instance['entity_type'] . '/' . $instance['bundle'],
   );
 
   return $element;
