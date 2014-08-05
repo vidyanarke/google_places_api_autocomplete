@@ -106,32 +106,32 @@ function places_api_autocomplete_field_widget_settings_form($field, $instance) {
     $form['places_api_options']['offset'] = array(
       '#type' => 'textfield',
       '#title' => 'Offset',
-      '#default_value' => $settings['places_api_options']['offset'] ? $settings['places_api_options']['offset'] : $places_api_options['offset'],
+      '#default_value' => isset($settings['places_api_options']['offset']) ? $settings['places_api_options']['offset'] : $places_api_options['offset'],
     );
     $form['places_api_options']['location'] = array(
       '#type' => 'textfield',
       '#title' => 'Location',
-      '#default_value' => $settings['places_api_options']['location'] ? $settings['places_api_options']['location'] : $places_api_options['location'],
+      '#default_value' => isset($settings['places_api_options']['location']) ? $settings['places_api_options']['location'] : $places_api_options['location'],
     );
     $form['places_api_options']['radius'] = array(
       '#type' => 'textfield',
       '#title' => 'Radius',
-      '#default_value' => $settings['places_api_options']['radius'] ? $settings['places_api_options']['radius'] : $places_api_options['radius'],
+      '#default_value' => isset($settings['places_api_options']['radius']) ? $settings['places_api_options']['radius'] : $places_api_options['radius'],
     );
     $form['places_api_options']['language'] = array(
       '#type' => 'textfield',
       '#title' => 'Language',
-      '#default_value' => $settings['places_api_options']['language'] ? $settings['places_api_options']['language'] : $places_api_options['language'],
+      '#default_value' => isset($settings['places_api_options']['language']) ? $settings['places_api_options']['language'] : $places_api_options['language'],
     );
     $form['places_api_options']['types'] = array(
       '#type' => 'textfield',
       '#title' => 'Types',
-      '#default_value' => $settings['places_api_options']['types'] ? $settings['places_api_options']['types'] : $places_api_options['types'],
+      '#default_value' => isset($settings['places_api_options']['types']) ? $settings['places_api_options']['types'] : $places_api_options['types'],
     );
     $form['places_api_options']['components'] = array(
       '#type' => 'textfield',
       '#title' => 'Components',
-      '#default_value' => $settings['places_api_options']['components'] ? $settings['places_api_options']['components'] : $places_api_options['components'],
+      '#default_value' => isset($settings['places_api_options']['components']) ? $settings['places_api_options']['components'] : $places_api_options['components'],
     );
   }
 
