@@ -72,7 +72,8 @@ On the settings page you can choose default values for these parameters, which
 can be overwritten at the field level, in the widget settings. For more
 information about what parameters are available, and what are the possible
 values for them, see:
-https://developers.google.com/places/webservice/autocomplete#place_autocomplete_requests
+https://developers.google.com/places/webservice/autocomplete#place_autocomplete
+_requests
 
 MAINTAINERS
 -----------
@@ -89,5 +90,3 @@ This project has been sponsored by:
    applications, and we’re just as skilled in implementing interfaces using
    HTML, CSS, and jQuery. Visit http://dreamproduction.com for more
    information.
-
-

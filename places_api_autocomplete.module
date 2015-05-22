@@ -59,7 +59,7 @@ function places_autocomplete($field_name = 'global', $entity_type = NULL, $bundl
     $key = variable_get('places_api_autocomplete_key', NULL);
 
     // Build a new cache object, this allows us to cache queries locally.
-    $cache_object = new GooglePlacesAutocompleteCacheDrupal();
+    $cache_object = new PlacesApiAutocompleteCacheDrupal();
 
     // If this is not a field, but instead used in a global context, use the
     // global options.
@@ -73,7 +73,7 @@ function places_autocomplete($field_name = 'global', $entity_type = NULL, $bundl
     }
 
     // Instantiate the autocomplete object.
-    $places_api = new GooglePlacesAutocomplete($key, $cache_object, $options);
+    $places_api = new PlacesApiAutocomplete($key, $cache_object, $options);
 
     // Perform the actual search.
     $result = $places_api->search($string);

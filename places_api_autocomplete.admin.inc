@@ -9,13 +9,14 @@
  * Form builder; Configure places_api_autocomplete settings for this site.
  *
  * @ingroup forms
+ *
  * @see system_settings_form()
  */
 function places_api_autocomplete_admin_settings() {
   $form['places_api_autocomplete_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Google API key'),
-    '#description' => 'You can get it from your <a href="https://code.google.com/apis/console">Google Console</a>.',
+    '#description' => t('You can get it from your <a href="https://code.google.com/apis/console">Google Console</a>.'),
     '#default_value' => variable_get('places_api_autocomplete_key', ''),
   );
 
