@@ -4,6 +4,7 @@ package = Fields
 core = 7.x
 
 files[] = includes/GooglePlacesAutocomplete.php
+files[] = includes/GPACacheServiceInterface.php
 files[] = includes/GooglePlacesAutocompleteCacheDrupal.php
 
 configure = admin/config/services/places

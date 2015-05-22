@@ -14,51 +14,51 @@
 function places_api_autocomplete_admin_settings() {
   $form['places_api_autocomplete_key'] = array(
     '#type' => 'textfield',
-    '#title' => 'Google API key',
+    '#title' => t('Google API key'),
     '#description' => 'You can get it from your <a href="https://code.google.com/apis/console">Google Console</a>.',
     '#default_value' => variable_get('places_api_autocomplete_key', ''),
   );
 
   $documentation_link = 'https://developers.google.com/places/documentation/autocomplete#place_autocomplete_requests';
-
   $places_api_options = variable_get('places_api_options', array());
+
   $form['places_api_options'] = array(
     '#type' => 'fieldset',
     '#title' => t('Places API parameters'),
     '#tree' => TRUE,
-    '#description' => 'Default values for places api paramaeters. Documentation about the paramenters, can be found <a target="_blank" href="' . $documentation_link . '">here</a>.',
+    '#description' => t('The values for the parameters will be used when the autocomplete path is used outside of the scope of a field widget (I.E.: FAPI autocomplete path). If you are using the field widget, these settings will have no effect. Documentation about the parameters, can be found <a target="_blank" href="@url">here</a>.', array('@url' => $documentation_link)),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
 
   $form['places_api_options']['offset'] = array(
     '#type' => 'textfield',
-    '#title' => 'Offset',
+    '#title' => t('Offset'),
     '#default_value' => $places_api_options['offset'],
   );
   $form['places_api_options']['location'] = array(
     '#type' => 'textfield',
-    '#title' => 'Location',
+    '#title' => t('Location'),
     '#default_value' => $places_api_options['location'],
   );
   $form['places_api_options']['radius'] = array(
     '#type' => 'textfield',
-    '#title' => 'Radius',
+    '#title' => t('Radius'),
     '#default_value' => $places_api_options['radius'],
   );
   $form['places_api_options']['language'] = array(
     '#type' => 'textfield',
-    '#title' => 'Language',
+    '#title' => t('Language'),
     '#default_value' => $places_api_options['language'],
   );
   $form['places_api_options']['types'] = array(
     '#type' => 'textfield',
-    '#title' => 'Types',
+    '#title' => t('Types'),
     '#default_value' => $places_api_options['types'],
   );
   $form['places_api_options']['components'] = array(
     '#type' => 'textfield',
-    '#title' => 'Components',
+    '#title' => t('Components'),
     '#default_value' => $places_api_options['components'],
   );
 

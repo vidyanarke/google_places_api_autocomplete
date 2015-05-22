@@ -1,6 +1,20 @@
 <?php
 
+/**
+ * @file
+ * Contains GooglePlacesAutocomplete.
+ */
+
+/**
+ * Queries the Google Places API for autocomplete suggestions.
+ */
 class GooglePlacesAutocomplete {
+
+  /**
+   * The input from the user.
+   * @var string
+   */
+  protected $input;
 
   /**
    * The Google API key.
@@ -15,235 +29,268 @@ class GooglePlacesAutocomplete {
   protected $endPoint = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?';
 
   /**
+   * The options (parameters) for the request to the Places API.
+   * @var array
+   */
+  protected $options = array();
+
+  /**
    * Static cache for the requests.
    * @var array
    */
   protected static $staticCache = array();
 
   /**
-   * [$results description]
-   * @var [type]
+   * A cache service.
+   * @var GPACacheServiceInterface
+   */
+  protected $cacheService;
+
+  /**
+   * The results of the query.
+   * @var array
    */
   protected $results;
 
   /**
-   * [construct description]
-   * @param  [type] $key          [description]
-   * @param  [type] $cache_object [description]
-   * @return [type]               [description]
+   * Constructor for GooglePlacesAutocomplete.
+   *
+   * @param  string                        $key          The Google API key.
+   * @param  GPACacheServiceInterface $cacheService A cache object, for local cacheing
    */
-  public function __construct($key, $cache_object = NULL, $options = array()) {
-    if (is_object($cache_object) && !($cache_object instanceof GooglePlacesAutocompleteCache)){
-      throw new Exception("Cache object must implement interface GooglePlacesAutocompleteCache", 1);
+  public function __construct($key, $cacheService = NULL, $options = array()) {
+    if (is_object($cacheService) && !($cacheService instanceof GPACacheServiceInterface)){
+      throw new Exception("Cache service must implement interface GPACacheServiceInterface", 1);
     }
     $this->setKey($key);
 
     $this->setOptions($options);
-    $this->setCacheObject($cache_object);
+    $this->setCacheService($cacheService);
   }
 
   /**
-   * [search description]
-   * @param  [type] $string [description]
-   * @return [type]         [description]
+   * Performs the search on the Places API.
+   *
+   * @param  string $string The query string.
+   * @return array          The results of the search.
    */
   public function search($string) {
-    $this->setKeywords($string);
+    $this->setInput($string);
     $this->executeSearch();
     return $this->getResults();
   }
 
   /**
-   * [getCid description]
-   * @return [type] [description]
+   * Constructs a cache id based the input.
+   * @return string The cid
    */
   protected function getCid() {
-    return 'hash-' . md5($this->getKeywords());
+    return 'hash-' . md5($this->getInput());
   }
 
   /**
-   * [cache_get description]
-   * @return [type] [description]
+   * Retrieves the results from cache.
+   *
+   * @return array The cached results, or NULL.
    */
   protected function cache_get() {
+    // Get the cid from the current input.
     $cid = $this->getCid();
 
+    // First, try to find the cid in the static cache.
     if (isset(self::$staticCache[$cid])) {
-      $cache = self::$staticCache[$cid];
-    }
-    elseif ($cacheObject = $this->getCacheObject()) {
-      $cache = $cacheObject->get($cid);
-      return $cache->data;
+      return self::$staticCache[$cid];
     }
 
-    if (isset($cache) && !empty($cache) && $cache->keywords !== $this->getKeywords()) {
-      return self::$staticCache[$cid] = $cache->data ;
+    // Alternativly try to use the cache service we received at construction.
+    if ($cacheService = $this->gertCacheService()) {
+      $cache = $cacheService->get($cid);
+
+      // If we found a cache value, validate the input is the same (to prevent
+      // an hypotetical situation where 2 input strings have the same hash).
+      if (isset($cache) && !empty($cache) && $cache->input === $this->getInput()) {
+        // Save the data in the static cache and return it.
+        return self::$staticCache[$cid] = $cache->data ;
+      }
     }
   }
 
   /**
-   * [cache_set description]
-   * @param  [type] $data [description]
-   * @return [type]       [description]
+   * Stores a value in the cache.
+   *
+   * @param  mixed $data The value to be stored.
    */
   protected function cache_set($data) {
     $cid = $this->getCid();
 
-    if ($cacheObject = $this->getCacheObject()) {
+    if ($cacheService = $this->gertCacheService()) {
       $cache = new StdClass();
       $cache->data = $data;
-      $cache->keywords = $this->getKeywords();
-      $cacheObject->set($cid, $cache);
+      // Add the input to the cache object, this allows validation on it at
+      // retrieval.
+      $cache->input = $this->getInput();
+      $cacheService->set($cid, $cache);
     }
   }
 
   /**
-   * [getKey description]
-   * @return [type] [description]
+   * Getter for the API key.
+   * @return string
    */
   public function getKey() {
     return $this->key;
   }
 
   /**
-   * [setkey description]
-   * @param  [type] $key [description]
-   * @return [type]      [description]
+   * Setter for the API key.
+   * @param  string $key
    */
   public function setkey($key) {
     $this->key = $key;
   }
 
   /**
-   * [setOptions description]
-   * @param [type] $options [description]
-   */
-  protected function setOptions($options) {
-    $this->options = $options;
-  }
-
-  /**
-   * [getOptions description]
-   * @return [type] [description]
+   * Getter for the options.
+   * @return array
    */
   protected function getOptions() {
     return $this->options;
   }
 
   /**
-   * [getCacheObject description]
-   * @return [type] [description]
+   * Setter for the options.
+   * @param array $options
    */
-  protected function getCacheObject() {
-    return $this->cacheObject;
+  protected function setOptions($options) {
+    $this->options = $options;
   }
 
   /**
-   * [setCacheObject description]
-   * @param [type] $cache_object [description]
+   * Getter for the cache service.
+   * @return GPACacheServiceInterface
    */
-  protected function setCacheObject($cache_object){
-    $this->cacheObject = $cache_object;
+  protected function gertCacheService() {
+    return $this->cacheService;
   }
 
   /**
-   * [setKeywords description]
-   * @param [type] $string [description]
+   * Setter for the cache service.
+   * @param GPACacheServiceInterface $cacheService
    */
-  public function setKeywords($string) {
-    $this->keywords = $string;
+  protected function setCacheService($cacheService){
+    $this->cacheService = $cacheService;
   }
 
   /**
-   * [getKeywords description]
-   * @return [type] [description]
+   * Getter for the input.
+   * @return string
    */
-  public function getKeywords() {
-    return $this->keywords;
+  public function getInput() {
+    return $this->input;
   }
 
   /**
-   * [setEndPoint description]
-   * @param [type] $endPoint [description]
+   * Setter for the input.
+   * @param string $string
    */
-  public function setEndPoint($endPoint) {
-    $this->endPoint = $endPoint;
+  public function setInput($string) {
+    $this->input = $string;
   }
 
   /**
-   * [getEndPoint description]
-   * @return [type] [description]
+   * Getter for the endpoint.
+   * @return string
    */
   public function getEndPoint() {
     return $this->endPoint;
   }
 
   /**
-   * [setResults description]
-   * @param [type] $results [description]
+   * Setter for the endpoint.
+   * @param string $endPoint
    */
-  public function setResults($results) {
-    $this->results = $results;
+  public function setEndPoint($endPoint) {
+    $this->endPoint = $endPoint;
   }
 
   /**
-   * [getResults description]
-   * @return [type] [description]
+   * Getter for the results.
+   * @return array
    */
   public function getResults() {
     return $this->results;
   }
 
   /**
-   * [executeSearch description]
-   * @return [type] [description]
+   * Setter for the results.
+   * @param array $results
+   */
+  public function setResults($results) {
+    $this->results = $results;
+  }
+
+  /**
+   * Executes the actual request to the Places API end point.
    */
   protected function executeSearch() {
+    // First, attempt to get the data from cache. If this fails, we will query
+    // the Places API.
     if (!$data = $this->cache_get()) {
       // Get cURL resource
       $curl = curl_init();
+
       // Set some options
       curl_setopt_array($curl, array(
           CURLOPT_RETURNTRANSFER => 1,
           CURLOPT_URL => $this->prepareUrl(),
       ));
-      // Send the request & save response to $resp
+
+      // Send the request
       $response = curl_exec($curl);
+
       // Close request to clear up some resources
       curl_close($curl);
+
+      // Decode the response json.
       $decoded_response = json_decode($response);
       if (!is_object($decoded_response) && $decoded_response->status !== 'OK') {
+        // If not an object or the status is not OK, we hit some error.
         throw new Exception("Error getting data from Google Places API", 1);
       }
+
+      // Get just the predictions from the response.
       $data = $decoded_response->predictions;
+
+      // Save these to cache for future requests.
       $this->cache_set($data);
     }
+
+    // Set the results.
     $this->setResults($data);
   }
 
   /**
-   * [prepareUrl description]
-   * @return [type] [description]
+   * Constructs the url for the request.
+   *
+   * @return string
    */
   protected function prepareUrl() {
+    // Get the options for the request.
     $options = $this->getOptions();
+
+    // Add the key and the input to them.
     $parameters = array(
       'key' => $this->getKey(),
-      'input' => $this->getKeywords(),
+      'input' => $this->getInput(),
     ) + $options;
 
+    // Url encode the parameters.
     $processedParameters = array();
     foreach ($parameters as $name => $value) {
       $processedParameters[] = urlencode($name) . '=' . urlencode($value);
     }
 
+    // Add the parameters to the endpoint and return them.
     return $this->getEndPoint() . implode('&', $processedParameters);
   }
-}
-
-
-interface GooglePlacesAutocompleteCache {
-  public function get($cid);
-  public function set($cid, $data);
-  public function clear();
 }

@@ -39,10 +39,9 @@ function places_api_autocomplete_menu() {
 
 /**
  * Returns autocomplete suggestions.
- * 
- * Returns autocomplete suggestions based on a given field, entity type, 
- * bundle and string or just use the globally defined values for places 
- * api parameters.
+ *
+ * Returns autocomplete suggestions based on a given field, entity type, bundle
+ * and string or just use the globally defined values for places api parameters.
  *
  * @param string $field_name
  *   The field name.
@@ -51,28 +50,41 @@ function places_api_autocomplete_menu() {
  * @param string $bundle
  *   The bundle.
  * @param string $string
- *   The label of the entity to query by.
+ *   The string for the search.
  */
 function places_autocomplete($field_name = 'global', $entity_type = NULL, $bundle = NULL, $string = '') {
   $matches = array();
   if ($string) {
+    // Get the Google API key.
     $key = variable_get('places_api_autocomplete_key', NULL);
+
+    // Build a new cache object, this allows us to cache queries locally.
     $cache_object = new GooglePlacesAutocompleteCacheDrupal();
+
+    // If this is not a field, but instead used in a global context, use the
+    // global options.
     if ($field_name == 'global') {
-      $options = variable_get('places_api_options');
+      $options = variable_get('places_api_options', array());
     }
     else {
       // We grab parameter options from the field instance settings.
       $instance = field_info_instance($entity_type, $field_name, $bundle);
       $options = $instance['widget']['settings']['places_api_options'];
     }
+
+    // Instantiate the autocomplete object.
     $places_api = new GooglePlacesAutocomplete($key, $cache_object, $options);
+
+    // Perform the actual search.
     $result = $places_api->search($string);
+
+    // Map the results in the format drupal autocomplete API needs it.
     foreach ($result as $place) {
       $matches[$place->description] = check_plain($place->description);
     }
   }
 
+  // Return the matches in json format, and stop the page execution.
   drupal_json_output($matches);
 }
 
@@ -115,44 +127,45 @@ function places_api_autocomplete_field_widget_settings_form($field, $instance) {
     );
 
     $documentation_link = 'https://developers.google.com/places/documentation/autocomplete#place_autocomplete_requests';
-    $places_api_options = variable_get('places_api_options');
+    $places_api_options = variable_get('places_api_options', array());
+
     $form['places_api_options'] = array(
       '#type' => 'fieldset',
       '#title' => t('Places API parameters'),
       '#tree' => TRUE,
-      '#description' => 'Documentation about the paramenters, can be found <a target="_blank" href="' . $documentation_link . '">here</a>.',
+      '#description' => t('Documentation about the parameters, can be found <a target="_blank" href="@url">here</a>.', array('@url' => $documentation_link)),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
     );
 
     $form['places_api_options']['offset'] = array(
       '#type' => 'textfield',
-      '#title' => 'Offset',
+      '#title' => t('Offset'),
       '#default_value' => isset($settings['places_api_options']['offset']) ? $settings['places_api_options']['offset'] : $places_api_options['offset'],
     );
     $form['places_api_options']['location'] = array(
       '#type' => 'textfield',
-      '#title' => 'Location',
+      '#title' => t('Location'),
       '#default_value' => isset($settings['places_api_options']['location']) ? $settings['places_api_options']['location'] : $places_api_options['location'],
     );
     $form['places_api_options']['radius'] = array(
       '#type' => 'textfield',
-      '#title' => 'Radius',
+      '#title' => t('Radius'),
       '#default_value' => isset($settings['places_api_options']['radius']) ? $settings['places_api_options']['radius'] : $places_api_options['radius'],
     );
     $form['places_api_options']['language'] = array(
       '#type' => 'textfield',
-      '#title' => 'Language',
+      '#title' => t('Language'),
       '#default_value' => isset($settings['places_api_options']['language']) ? $settings['places_api_options']['language'] : $places_api_options['language'],
     );
     $form['places_api_options']['types'] = array(
       '#type' => 'textfield',
-      '#title' => 'Types',
+      '#title' => t('Types'),
       '#default_value' => isset($settings['places_api_options']['types']) ? $settings['places_api_options']['types'] : $places_api_options['types'],
     );
     $form['places_api_options']['components'] = array(
       '#type' => 'textfield',
-      '#title' => 'Components',
+      '#title' => t('Components'),
       '#default_value' => isset($settings['places_api_options']['components']) ? $settings['places_api_options']['components'] : $places_api_options['components'],
     );
   }
