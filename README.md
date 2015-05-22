@@ -5,7 +5,7 @@ Also you can use the autocomplete path it defines for your own FAPI implementati
 # How to use the module
 1. The module exposes a widget for text fields.
 2. Set the Google Places Autocomplete widget for the text field you want.
-3. When typing intp the text field, you can see suggestions based on the characters you typed.
+3. When typing into the text field, you can see suggestions based on the characters you typed.
 
 # How to configure the module
 1. Go to admin/config/services/places
