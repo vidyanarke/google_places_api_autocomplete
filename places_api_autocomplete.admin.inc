@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * @file
+ * Admin page callback file for the places_api_autocomplete module.
+ */
+
+/**
+ * Form builder; Configure places_api_autocomplete settings for this site.
+ *
+ * @ingroup forms
+ * @see system_settings_form()
+ */
 function places_api_autocomplete_admin_settings() {
   $form['places_api_autocomplete_key'] = array(
     '#type' => 'textfield',
@@ -10,12 +21,12 @@ function places_api_autocomplete_admin_settings() {
 
   $documentation_link = 'https://developers.google.com/places/documentation/autocomplete#place_autocomplete_requests';
 
-  $places_api_options = variable_get('places_api_options');
+  $places_api_options = variable_get('places_api_options', array());
   $form['places_api_options'] = array(
     '#type' => 'fieldset',
     '#title' => t('Places API parameters'),
     '#tree' => TRUE,
-    '#description' => 'Documentation about the paramenters, can be found <a target="_blank" href="' . $documentation_link . '">here</a>.',
+    '#description' => 'Default values for places api paramaeters. Documentation about the paramenters, can be found <a target="_blank" href="' . $documentation_link . '">here</a>.',
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );

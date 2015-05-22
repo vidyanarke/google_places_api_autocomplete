@@ -74,7 +74,6 @@ class GooglePlacesAutocomplete {
     elseif ($cacheObject = $this->getCacheObject()) {
       $cache = $cacheObject->get($cid);
       return $cache->data;
-      var_dump($cache);;die;
     }
 
     if (isset($cache) && !empty($cache) && $cache->keywords !== $this->getKeywords()) {

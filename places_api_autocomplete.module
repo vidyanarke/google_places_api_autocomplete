@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Google Places API autocomplete module.
+ */
+
+/**
  * Implements hook_menu().
  */
 function places_api_autocomplete_menu() {
@@ -32,20 +37,37 @@ function places_api_autocomplete_menu() {
   return $items;
 }
 
+/**
+ * Returns autocomplete suggestions.
+ * 
+ * Returns autocomplete suggestions based on a given field, entity type, 
+ * bundle and string or just use the globally defined values for places 
+ * api parameters.
+ *
+ * @param string $field_name
+ *   The field name.
+ * @param string $entity_type
+ *   The entity type.
+ * @param string $bundle
+ *   The bundle.
+ * @param string $string
+ *   The label of the entity to query by.
+ */
 function places_autocomplete($field_name = 'global', $entity_type = NULL, $bundle = NULL, $string = '') {
   $matches = array();
   if ($string) {
     $key = variable_get('places_api_autocomplete_key', NULL);
-    $cacheObject = new GooglePlacesAutocompleteCacheDrupal();
-    if ($field_name == 'global'){
+    $cache_object = new GooglePlacesAutocompleteCacheDrupal();
+    if ($field_name == 'global') {
       $options = variable_get('places_api_options');
-    }else{
+    }
+    else {
       // We grab parameter options from the field instance settings.
       $instance = field_info_instance($entity_type, $field_name, $bundle);
       $options = $instance['widget']['settings']['places_api_options'];
     }
-    $placesApi = new GooglePlacesAutocomplete($key, $cacheObject, $options);
-    $result = $placesApi->search($string);
+    $places_api = new GooglePlacesAutocomplete($key, $cache_object, $options);
+    $result = $places_api->search($string);
     foreach ($result as $place) {
       $matches[$place->description] = check_plain($place->description);
     }
@@ -67,7 +89,7 @@ function places_api_autocomplete_field_widget_info() {
         'size' => 60,
         'offset' => '',
         'location' => '',
-        'radius' =>  '',
+        'radius' => '',
         'language' => '',
         'type' => '',
         'components' => '',

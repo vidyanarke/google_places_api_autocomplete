@@ -1,6 +1,16 @@
 <?php
 
+/**
+ * @file
+ * Install, update and uninstall functions for the 
+ * places_api_autocomplete module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
 function places_api_autocomplete_schema() {
   $schema['cache_places'] = drupal_get_schema_unprocessed('system', 'cache');
+
   return $schema;
 }
