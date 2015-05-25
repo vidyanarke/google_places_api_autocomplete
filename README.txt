@@ -67,13 +67,12 @@ FAQ
 ---
 Q: What are the Parameters on the settings page?
 
-A: The Google Places Api requests can use parameters to restricte the results.
+A: The Google Places Api requests can use parameters to restrict the results.
 On the settings page you can choose values for these parameters for the case
 where the autocomplete path is used directly, without a field. For more
 information about what parameters are available, and what are the possible
 values for them, see:
-https://developers.google.com/places/webservice/autocomplete#place_autocomplete
-_requests
+https://developers.google.com/places/webservice/autocomplete#place_autocomplete_requests
 
 MAINTAINERS
 -----------
