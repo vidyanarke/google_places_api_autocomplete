@@ -15,25 +15,6 @@ function places_api_autocomplete_schema() {
 }
 
 /**
- * Implements hook_install().
- */
-function places_api_autocomplete_install() {
-  // Default places api options.
-  $options = array(
-    'offset' => '',
-    'location' => '',
-    'radius' => '',
-    'language' => '',
-    'types' => '',
-    'components' => '',
-  );
-  variable_set('places_api_autocomplete_options', $options);
-  
-  // Default places api key.
-  variable_set('places_api_autocomplete_key', '');
-}
-
-/**
  * Implements hook_uninstall().
  */
 function places_api_autocomplete_uninstall() {

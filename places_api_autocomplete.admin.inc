@@ -21,7 +21,7 @@ function places_api_autocomplete_admin_settings() {
   );
 
   $documentation_link = 'https://developers.google.com/places/documentation/autocomplete#place_autocomplete_requests';
-  $places_api_autocomplete_options = variable_get('places_api_autocomplete_options', array());
+  $options = variable_get('places_api_autocomplete_options', places_api_autocomplete_get_default_options());
 
   $form['places_api_autocomplete_options'] = array(
     '#type' => 'fieldset',
@@ -35,32 +35,32 @@ function places_api_autocomplete_admin_settings() {
   $form['places_api_autocomplete_options']['offset'] = array(
     '#type' => 'textfield',
     '#title' => t('Offset'),
-    '#default_value' => $places_api_autocomplete_options['offset'],
+    '#default_value' => $options['offset'],
   );
   $form['places_api_autocomplete_options']['location'] = array(
     '#type' => 'textfield',
     '#title' => t('Location'),
-    '#default_value' => $places_api_autocomplete_options['location'],
+    '#default_value' => $options['location'],
   );
   $form['places_api_autocomplete_options']['radius'] = array(
     '#type' => 'textfield',
     '#title' => t('Radius'),
-    '#default_value' => $places_api_autocomplete_options['radius'],
+    '#default_value' => $options['radius'],
   );
   $form['places_api_autocomplete_options']['language'] = array(
     '#type' => 'textfield',
     '#title' => t('Language'),
-    '#default_value' => $places_api_autocomplete_options['language'],
+    '#default_value' => $options['language'],
   );
   $form['places_api_autocomplete_options']['types'] = array(
     '#type' => 'textfield',
     '#title' => t('Types'),
-    '#default_value' => $places_api_autocomplete_options['types'],
+    '#default_value' => $options['types'],
   );
   $form['places_api_autocomplete_options']['components'] = array(
     '#type' => 'textfield',
     '#title' => t('Components'),
-    '#default_value' => $places_api_autocomplete_options['components'],
+    '#default_value' => $options['components'],
   );
 
   return system_settings_form($form);
