@@ -11,14 +11,14 @@
 function places_api_autocomplete_menu() {
   $items['places/autocomplete'] = array(
     'title' => 'Places autocomplete',
-    'page callback' => 'places_autocomplete',
+    'page callback' => 'places_api_autocomplete',
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
 
   $items['places/autocomplete/%/%/%'] = array(
     'title' => 'Places autocomplete',
-    'page callback' => 'places_autocomplete',
+    'page callback' => 'places_api_autocomplete',
     'page arguments' => array(2, 3, 4),
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
@@ -52,7 +52,7 @@ function places_api_autocomplete_menu() {
  * @param string $string
  *   The string for the search.
  */
-function places_autocomplete($field_name = 'global', $entity_type = NULL, $bundle = NULL, $string = '') {
+function places_api_autocomplete($field_name = 'global', $entity_type = NULL, $bundle = NULL, $string = '') {
   $matches = array();
   if ($string) {
     // Get the Google API key.
@@ -64,12 +64,12 @@ function places_autocomplete($field_name = 'global', $entity_type = NULL, $bundl
     // If this is not a field, but instead used in a global context, use the
     // global options.
     if ($field_name == 'global') {
-      $options = variable_get('places_api_options', array());
+      $options = variable_get('places_api_autocomplete_options', array());
     }
     else {
       // We grab parameter options from the field instance settings.
       $instance = field_info_instance($entity_type, $field_name, $bundle);
-      $options = $instance['widget']['settings']['places_api_options'];
+      $options = $instance['widget']['settings']['places_api_autocomplete_options'];
     }
 
     // Instantiate the autocomplete object.
@@ -93,7 +93,7 @@ function places_autocomplete($field_name = 'global', $entity_type = NULL, $bundl
  */
 function places_api_autocomplete_field_widget_info() {
   return array(
-    'places_autocomplete' => array(
+    'places_api_autocomplete' => array(
       'label' => 'Google Places Autocomplete',
       'description' => 'A text field with Google Places API Autocomplete',
       'field types' => array('text'),
@@ -117,7 +117,7 @@ function places_api_autocomplete_field_widget_settings_form($field, $instance) {
   $widget = $instance['widget'];
   $settings = $widget['settings'];
 
-  if ($widget['type'] == 'places_autocomplete') {
+  if ($widget['type'] == 'places_api_autocomplete') {
     $form['size'] = array(
       '#type' => 'textfield',
       '#title' => t('Size of textfield'),
@@ -127,9 +127,9 @@ function places_api_autocomplete_field_widget_settings_form($field, $instance) {
     );
 
     $documentation_link = 'https://developers.google.com/places/documentation/autocomplete#place_autocomplete_requests';
-    $places_api_options = variable_get('places_api_options', array());
+    $places_api_autocomplete_options = variable_get('places_api_autocomplete_options', array());
 
-    $form['places_api_options'] = array(
+    $form['places_api_autocomplete_options'] = array(
       '#type' => 'fieldset',
       '#title' => t('Places API parameters'),
       '#tree' => TRUE,
@@ -138,35 +138,35 @@ function places_api_autocomplete_field_widget_settings_form($field, $instance) {
       '#collapsed' => TRUE,
     );
 
-    $form['places_api_options']['offset'] = array(
+    $form['places_api_autocomplete_options']['offset'] = array(
       '#type' => 'textfield',
       '#title' => t('Offset'),
-      '#default_value' => isset($settings['places_api_options']['offset']) ? $settings['places_api_options']['offset'] : $places_api_options['offset'],
+      '#default_value' => isset($settings['places_api_autocomplete_options']['offset']) ? $settings['places_api_autocomplete_options']['offset'] : $places_api_autocomplete_options['offset'],
     );
-    $form['places_api_options']['location'] = array(
+    $form['places_api_autocomplete_options']['location'] = array(
       '#type' => 'textfield',
       '#title' => t('Location'),
-      '#default_value' => isset($settings['places_api_options']['location']) ? $settings['places_api_options']['location'] : $places_api_options['location'],
+      '#default_value' => isset($settings['places_api_autocomplete_options']['location']) ? $settings['places_api_autocomplete_options']['location'] : $places_api_autocomplete_options['location'],
     );
-    $form['places_api_options']['radius'] = array(
+    $form['places_api_autocomplete_options']['radius'] = array(
       '#type' => 'textfield',
       '#title' => t('Radius'),
-      '#default_value' => isset($settings['places_api_options']['radius']) ? $settings['places_api_options']['radius'] : $places_api_options['radius'],
+      '#default_value' => isset($settings['places_api_autocomplete_options']['radius']) ? $settings['places_api_autocomplete_options']['radius'] : $places_api_autocomplete_options['radius'],
     );
-    $form['places_api_options']['language'] = array(
+    $form['places_api_autocomplete_options']['language'] = array(
       '#type' => 'textfield',
       '#title' => t('Language'),
-      '#default_value' => isset($settings['places_api_options']['language']) ? $settings['places_api_options']['language'] : $places_api_options['language'],
+      '#default_value' => isset($settings['places_api_autocomplete_options']['language']) ? $settings['places_api_autocomplete_options']['language'] : $places_api_autocomplete_options['language'],
     );
-    $form['places_api_options']['types'] = array(
+    $form['places_api_autocomplete_options']['types'] = array(
       '#type' => 'textfield',
       '#title' => t('Types'),
-      '#default_value' => isset($settings['places_api_options']['types']) ? $settings['places_api_options']['types'] : $places_api_options['types'],
+      '#default_value' => isset($settings['places_api_autocomplete_options']['types']) ? $settings['places_api_autocomplete_options']['types'] : $places_api_autocomplete_options['types'],
     );
-    $form['places_api_options']['components'] = array(
+    $form['places_api_autocomplete_options']['components'] = array(
       '#type' => 'textfield',
       '#title' => t('Components'),
-      '#default_value' => isset($settings['places_api_options']['components']) ? $settings['places_api_options']['components'] : $places_api_options['components'],
+      '#default_value' => isset($settings['places_api_autocomplete_options']['components']) ? $settings['places_api_autocomplete_options']['components'] : $places_api_autocomplete_options['components'],
     );
   }
 
