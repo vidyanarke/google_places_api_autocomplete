@@ -20,7 +20,7 @@ function places_api_autocomplete_admin_settings() {
     '#default_value' => variable_get('places_api_autocomplete_key', ''),
   );
 
-  $documentation_link = 'https://developers.google.com/places/documentation/autocomplete#place_autocomplete_requests';
+  $documentation_link = variable_get('places_api_autocomplete_documentation_link');
   $options = variable_get('places_api_autocomplete_options', places_api_autocomplete_get_default_options());
 
   $form['places_api_autocomplete_options'] = array(

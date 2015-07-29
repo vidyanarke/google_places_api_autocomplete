@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains ~~.
+ * Contains PlacesApiAutocompleteCacheServiceInterface.
  */
 
 /**
