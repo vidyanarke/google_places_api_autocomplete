@@ -19,11 +19,10 @@ function places_api_autocomplete_schema() {
  */
 function places_api_autocomplete_install() {
   // Provide a link to module settings
-  $t = get_t();
-  drupal_set_message($t("Google Places API settings are available under !link", 
-    array( '!link' => l(t('Administration > Configuration > Web Services > Google Places API'),  'admin/config/services/places'))
-  ));
-  
+  drupal_set_message("Google Places API settings are available under !link", 
+    array( '!link' => l('Administration > Configuration > Web Services > Google Places API',  'admin/config/services/places'))
+  );
+
   // Set documentation link
   variable_set('places_api_autocomplete_documentation_link','https://developers.google.com/places/documentation/autocomplete#place_autocomplete_requests');
 }
