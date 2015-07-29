@@ -89,6 +89,18 @@ function places_api_autocomplete($field_name = 'global', $entity_type = NULL, $b
 }
 
 /**
+ * Implements hook_init().
+ */
+function places_api_autocomplete_init() {
+  // Get the Google API key.
+  $key = variable_get('places_api_autocomplete_key', NULL);
+  // Check if key doesnt exist and set warning message
+  if($key == NULL){
+    drupal_set_message(t('Google API key is missing, you need to enter the API key <a href="@url">here</a>', array('@url' => url('admin/config/services/places'))),'warning');
+  }
+}
+
+/**
  * Implements hook_field_widget_info().
  */
 function places_api_autocomplete_field_widget_info() {

@@ -293,7 +293,7 @@ class PlacesApiAutocomplete {
 
       // Decode the response json.
       $decoded_response = json_decode($response);
-      if (!is_object($decoded_response) && $decoded_response->status !== 'OK') {
+      if (!is_object($decoded_response) || $decoded_response->status !== 'OK') {
         // If not an object or the status is not OK, we hit some error.
         throw new Exception("Error getting data from Google Places API", 1);
       }
