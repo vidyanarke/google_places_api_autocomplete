@@ -94,9 +94,9 @@ function places_api_autocomplete($field_name = 'global', $entity_type = NULL, $b
 function places_api_autocomplete_init() {
   // Get the Google API key.
   $key = variable_get('places_api_autocomplete_key', NULL);
-  // Check if key doesnt exist and set warning message
-  if($key == NULL){
-    drupal_set_message(t('Google API key is missing, you need to enter the API key <a href="@url">here</a>', array('@url' => url('admin/config/services/places'))),'warning');
+  // Check if key doesnt exist and set warning message.
+  if ($key == NULL) {
+    drupal_set_message(t('Google API key is missing, you need to enter the API key <a href="@url">here</a>', array('@url' => url('admin/config/services/places'))), 'warning');
   }
 }
 
@@ -191,7 +191,7 @@ function places_api_autocomplete_field_widget_settings_form($field, $instance) {
 function places_api_autocomplete_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   $element['value'] = array(
     '#type' => 'textfield',
-    '#title' => $instance['label'],
+    '#title' => check_plain($instance['label']),
     '#default_value' => isset($items[$delta]['value']) ? $items[$delta]['value'] : NULL,
     '#size' => $instance['widget']['settings']['size'],
     '#maxlength' => $field['settings']['max_length'],
@@ -203,7 +203,7 @@ function places_api_autocomplete_field_widget_form(&$form, &$form_state, $field,
 }
 
 /**
- * Return default options
+ * Return default options.
  */
 function places_api_autocomplete_get_default_options() {
   return array(
