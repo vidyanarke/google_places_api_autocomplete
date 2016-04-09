@@ -53,6 +53,7 @@ function places_api_autocomplete_menu() {
  *   The string for the search.
  */
 function places_api_autocomplete($field_name = 'global', $entity_type = NULL, $bundle = NULL, $string = '') {
+  global $language;
   $matches = array();
   if ($string) {
     // Get the Google API key.
@@ -71,6 +72,10 @@ function places_api_autocomplete($field_name = 'global', $entity_type = NULL, $b
       $instance = field_info_instance($entity_type, $field_name, $bundle);
       $options = $instance['widget']['settings']['places_api_autocomplete_options'];
     }
+
+    // Add te active language as a parameter to get the results in the site's
+    // active language.
+    $options['language'] = $language->language;
 
     // Instantiate the autocomplete object.
     $places_api = new PlacesApiAutocomplete($key, $cache_object, $options);
