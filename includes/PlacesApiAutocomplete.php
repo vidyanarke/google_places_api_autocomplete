@@ -293,9 +293,18 @@ class PlacesApiAutocomplete {
 
       // Decode the response json.
       $decoded_response = json_decode($response);
-      if (!is_object($decoded_response) || $decoded_response->status !== 'OK') {
-        // If not an object or the status is not OK, we hit some error.
-        throw new Exception("Error getting data from Google Places API", 1);
+      // If not an object we hit some unknown error.
+      if (!is_object($decoded_response)) {
+        $error_msg = "Unknown error getting data from Google Places API.";
+        throw new GooglePlacesAPIAutocompleteException($error_msg, 1);
+      }
+      // If status code is not OK or ZERO_RESULTS, we hit a defined Places API error
+      if (!in_array($decoded_response->status, array('OK', 'ZERO_RESULTS'))) {
+        $error_msg = $decoded_response->status;
+        if (isset($decoded_response->error_message)) {
+          $error_msg .= ": {$decoded_response->error_message}";
+        }
+        throw new GooglePlacesAPIAutocompleteException($error_msg, 1);
       }
 
       // Get just the predictions from the response.

@@ -73,19 +73,25 @@ function places_api_autocomplete($field_name = 'global', $entity_type = NULL, $b
       $options = $instance['widget']['settings']['places_api_autocomplete_options'];
     }
 
-    // Add te active language as a parameter to get the results in the site's
+    // Add the active language as a parameter to get the results in the site's
     // active language.
     $options['language'] = $language->language;
 
     // Instantiate the autocomplete object.
     $places_api = new PlacesApiAutocomplete($key, $cache_object, $options);
 
-    // Perform the actual search.
-    $result = $places_api->search($string);
+    try {
+      // Perform the actual search.
+      $result = $places_api->search($string);
 
-    // Map the results in the format drupal autocomplete API needs it.
-    foreach ($result as $place) {
-      $matches[$place->description] = check_plain($place->description);
+      // Map the results in the format drupal autocomplete API needs it.
+      foreach ($result as $place) {
+        $matches[$place->description] = check_plain($place->description);
+      }
+    }
+    catch (GooglePlacesAPIAutocompleteException $e) {
+      // Search failed, log error message
+      watchdog('google places api autocomplete', $e->getMessage(), array(), WATCHDOG_ERROR);
     }
   }
 
