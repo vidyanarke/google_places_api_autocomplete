@@ -55,23 +55,24 @@ function places_api_autocomplete_menu() {
 function places_api_autocomplete($field_name = 'global', $entity_type = NULL, $bundle = NULL, $string = '') {
   global $language;
   $matches = array();
-  if ($string) {
+
+  // If this is not a field, but instead used in a global context, use the
+  // global options.
+  if ($field_name == 'global') {
+    $options = variable_get('places_api_autocomplete_options', places_api_autocomplete_get_default_options());
+  }
+  else {
+    // We grab parameter options from the field instance settings.
+    $instance = field_info_instance($entity_type, $field_name, $bundle);
+    $options = $instance['widget']['settings']['places_api_autocomplete_options'];
+  }
+
+  if ($string && strlen($string) >= $options['minlength']) {
     // Get the Google API key.
     $key = variable_get('places_api_autocomplete_key', NULL);
 
     // Build a new cache object, this allows us to cache queries locally.
     $cache_object = new PlacesApiAutocompleteCacheDrupal();
-
-    // If this is not a field, but instead used in a global context, use the
-    // global options.
-    if ($field_name == 'global') {
-      $options = variable_get('places_api_autocomplete_options', places_api_autocomplete_get_default_options());
-    }
-    else {
-      // We grab parameter options from the field instance settings.
-      $instance = field_info_instance($entity_type, $field_name, $bundle);
-      $options = $instance['widget']['settings']['places_api_autocomplete_options'];
-    }
 
     // Add the active language as a parameter to get the results in the site's
     // active language.
@@ -128,6 +129,7 @@ function places_api_autocomplete_field_widget_info() {
         'language' => '',
         'type' => '',
         'components' => '',
+        'minlength' => '',
       ),
     ),
   );
@@ -191,6 +193,11 @@ function places_api_autocomplete_field_widget_settings_form($field, $instance) {
       '#title' => t('Components'),
       '#default_value' => isset($settings['places_api_autocomplete_options']['components']) ? $settings['places_api_autocomplete_options']['components'] : $options['components'],
     );
+    $form['places_api_autocomplete_options']['minlength'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Minimum Query Length'),
+      '#default_value' => isset($settings['places_api_autocomplete_options']['minlength']) ? $settings['places_api_autocomplete_options']['minlength'] : $options['minlength'],
+    );
   }
 
   return $form;
@@ -209,6 +216,7 @@ function places_api_autocomplete_field_widget_form(&$form, &$form_state, $field,
     '#attributes' => array('class' => array('text-full')),
     '#required' => $instance['required'],
     '#autocomplete_path' => 'places/autocomplete/' . $instance['field_name'] . '/' . $instance['entity_type'] . '/' . $instance['bundle'],
+    '#minlength' => $instance['widget']['settings']['minlength'],
   );
 
   return $element;
@@ -225,6 +233,7 @@ function places_api_autocomplete_get_default_options() {
     'language' => '',
     'types' => '',
     'components' => '',
+    'minlength' => '',
   );
 }
 

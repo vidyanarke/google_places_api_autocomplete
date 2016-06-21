@@ -62,6 +62,11 @@ function places_api_autocomplete_admin_settings() {
     '#title' => t('Components'),
     '#default_value' => $options['components'],
   );
+  $form['places_api_autocomplete_options']['minlength'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Minimum Query Length'),
+    '#default_value' => isset($settings['places_api_autocomplete_options']['minlength']) ? $settings['places_api_autocomplete_options']['minlength'] : $options['minlength'],
+  );
 
   return system_settings_form($form);
 }
