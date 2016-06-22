@@ -67,26 +67,19 @@ function places_api_autocomplete($field_name = 'global', $entity_type = NULL, $b
     $options = $instance['widget']['settings']['places_api_autocomplete_options'];
   }
 
+  // Add the active language as a parameter to get the results in the site's
+  // active language.
+  $options['language'] = $language->language;
+
   if ($string && strlen($string) >= $options['minlength']) {
-    // Get the Google API key.
-    $key = variable_get('places_api_autocomplete_key', NULL);
-
-    // Build a new cache object, this allows us to cache queries locally.
-    $cache_object = new PlacesApiAutocompleteCacheDrupal();
-
-    // Add the active language as a parameter to get the results in the site's
-    // active language.
-    $options['language'] = $language->language;
-
-    // Instantiate the autocomplete object.
-    $places_api = new PlacesApiAutocomplete($key, $cache_object, $options);
-
+    $query = PlacesApiAutocompleteFactory::construct()->query($string, $options);
+    
     try {
       // Perform the actual search.
-      $result = $places_api->search($string);
+      $places = $query->execute();
 
       // Map the results in the format drupal autocomplete API needs it.
-      foreach ($result as $place) {
+      foreach ($places as $place) {
         $matches[$place->description] = check_plain($place->description);
       }
     }
