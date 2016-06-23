@@ -1,14 +1,16 @@
 <?php
 
+namespace Drupal\places_api_autocomplete\Cache;
+
 /**
  * @file
- * Contains PlacesApiAutocompleteCacheServiceInterface.
+ * Contains Drupal\places_api_autocomplete\Cache\CacheInterface.
  */
 
 /**
  * Google Places API Interface for the Cache service.
  */
-interface PlacesApiAutocompleteCacheServiceInterface {
+interface CacheInterface {
 
   /**
    * Get the data from the cache for the provided cid.

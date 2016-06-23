@@ -5,6 +5,9 @@
  * Google Places API autocomplete module.
  */
 
+use Drupal\places_api_autocomplete\Exception\RequestException;
+use Drupal\places_api_autocomplete\Query\QueryFactory;
+
 /**
  * Implements hook_menu().
  */
@@ -72,7 +75,7 @@ function places_api_autocomplete($field_name = 'global', $entity_type = NULL, $b
   $options['language'] = $language->language;
 
   if ($string && strlen($string) >= $options['minlength']) {
-    $query = PlacesApiAutocompleteFactory::construct()->query($string, $options);
+    $query = QueryFactory::construct()->query($string, $options);
     
     try {
       // Perform the actual search.
@@ -83,7 +86,7 @@ function places_api_autocomplete($field_name = 'global', $entity_type = NULL, $b
         $matches[$place->description] = check_plain($place->description);
       }
     }
-    catch (GooglePlacesAPIAutocompleteException $e) {
+    catch (RequestException $e) {
       // Search failed, log error message
       watchdog('google places api autocomplete', $e->getMessage(), array(), WATCHDOG_ERROR);
     }

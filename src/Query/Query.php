@@ -1,14 +1,18 @@
 <?php
 
+namespace Drupal\places_api_autocomplete\Query;
+
 /**
  * @file
- * Contains PlacesApiAutocompleteQuery.
+ * Contains Drupal\places_api_autocomplete\Query\Query.
  */
+use Drupal\places_api_autocomplete\Cache\CacheInterface;
+use Drupal\places_api_autocomplete\Exception\RequestException;
 
 /**
  * Queries the Google Places API for autocomplete suggestions.
  */
-class PlacesApiAutocompleteQuery {
+class Query implements QueryInterface {
 
   /**
    * The input from the user.
@@ -64,21 +68,15 @@ class PlacesApiAutocompleteQuery {
    *
    * @param string $key
    *   The Google API key.
-   * @param \PlacesApiAutocompleteCacheServiceInterface $cache
+   * @param \Drupal\places_api_autocomplete\Cache\CacheInterface $cache
    */
-  public function __construct($key, PlacesApiAutocompleteCacheServiceInterface $cache = NULL) {
+  public function __construct($key, CacheInterface $cache = NULL) {
     $this->key = $key;
     $this->cache = $cache;
   }
 
   /**
-   * Performs the search on the Places API.
-   *
-   * @param string $input
-   *   The query string.
-   * @param array $options
-   * @return PlacesApiAutocompleteQuery
-   * @throws \GooglePlacesAPIAutocompleteException
+   * {@inheritdoc}
    */
   public function query($input, $options = array()) {
     $this->input = $input;
@@ -87,13 +85,11 @@ class PlacesApiAutocompleteQuery {
   }
 
   /**
-   * Constructs a cache id based on the input.
-   *
-   * @return string
-   *   The cid
+   * {@inheritdoc}
    */
-  private function getCid() {
-    return 'hash-' . md5($this->input);
+  public function execute() {
+    $this->executeSearch();
+    return $this->results;
   }
 
   /**
@@ -134,7 +130,7 @@ class PlacesApiAutocompleteQuery {
     $cid = $this->getCid();
 
     if ($this->cache) {
-      $cache = new StdClass();
+      $cache = new \StdClass();
       $cache->data = $data;
       // Add the input to the cache object, this allows validation on it at
       // retrieval.
@@ -144,14 +140,13 @@ class PlacesApiAutocompleteQuery {
   }
 
   /**
-   * Execute the query.
+   * Constructs a cache id based on the input.
    *
-   * @return array
-   *   The results.
+   * @return string
+   *   The cid
    */
-  public function execute() {
-    $this->executeSearch();
-    return $this->results;
+  private function getCid() {
+    return 'hash-' . md5($this->input);
   }
 
   /**
@@ -181,7 +176,7 @@ class PlacesApiAutocompleteQuery {
       // If not an object we hit some unknown error.
       if (!is_object($decoded_response)) {
         $error_msg = "Unknown error getting data from Google Places API.";
-        throw new GooglePlacesAPIAutocompleteException($error_msg, 1);
+        throw new RequestException($error_msg, 1);
       }
       // If status code is not OK or ZERO_RESULTS, we hit a defined Places API error
       if (!in_array($decoded_response->status, array('OK', 'ZERO_RESULTS'))) {
@@ -189,7 +184,7 @@ class PlacesApiAutocompleteQuery {
         if (isset($decoded_response->error_message)) {
           $error_msg .= ": {$decoded_response->error_message}";
         }
-        throw new GooglePlacesAPIAutocompleteException($error_msg, 1);
+        throw new RequestException($error_msg, 1);
       }
 
       // Get just the predictions from the response.

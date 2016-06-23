@@ -1,14 +1,16 @@
 <?php
 
+namespace Drupal\places_api_autocomplete\Cache;
+
 /**
  * @file
- * Contains PlacesApiAutocompleteCacheDrupal.
+ * Contains Drupal\places_api_autocomplete\Cache\CacheDrupal.
  */
 
 /**
  * A cache service that uses the Drupal caching system.
  */
-class PlacesApiAutocompleteCacheDrupal implements PlacesApiAutocompleteCacheServiceInterface {
+class CacheDrupal implements CacheInterface {
 
   /**
    * The cache bin that will be used.

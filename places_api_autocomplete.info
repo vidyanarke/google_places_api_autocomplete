@@ -3,9 +3,6 @@ description = Provides an autocomplete path integrated with Google Places API.
 package = Fields
 core = 7.x
 
-files[] = includes/PlacesApiAutocompleteFactory.php
-files[] = includes/PlacesApiAutocompleteQuery.php
-files[] = includes/PlacesApiAutocompleteCacheServiceInterface.php
-files[] = includes/PlacesApiAutocompleteCacheDrupal.php
+dependencies[] = xautoload
 
 configure = admin/config/services/places
