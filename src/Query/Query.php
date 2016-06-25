@@ -9,6 +9,7 @@ namespace Drupal\places_api_autocomplete\Query;
 use Drupal\places_api_autocomplete\Cache\CacheInterface;
 use Drupal\places_api_autocomplete\Exception\RequestException;
 use Fig\Cache\Memory\MemoryPool;
+use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -16,19 +17,14 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class Query implements QueryInterface {
 
+  const BASE_URL = 'https://maps.googleapis.com/maps/api/place/autocomplete/';
+
   /**
    * The Google API key.
    *
    * @var string
    */
   protected $key;
-
-  /**
-   * The Google API endpoint.
-   *
-   * @var string
-   */
-  protected $endPoint = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?';
 
   /**
    * The input from the user.
@@ -150,34 +146,32 @@ class Query implements QueryInterface {
     // First, attempt to get the data from cache. If this fails, we will query
     // the Places API.
     if (!$data = $this->cacheGet()) {
-      // Get cURL resource.
-      $curl = curl_init();
-
-      // Set some options.
-      curl_setopt_array($curl, array(
-          CURLOPT_RETURNTRANSFER => 1,
-          CURLOPT_URL => $this->prepareUrl(),
+      $client = new Client(array(
+        'base_uri' => static::BASE_URL,
       ));
 
-      // Send the request.
-      $response = curl_exec($curl);
+      $response = $client->get($this->prepareUri());
 
-      // Close request to clear up some resources.
-      curl_close($curl);
+      if ($response->getStatusCode() !== 200) {
+        $error_msg = strtr("Request failed with status: @status.", array('@status' => $response->getStatusCode()));
+        throw new RequestException($error_msg, 1);
+      }
 
       // Decode the response json.
-      $decoded_response = json_decode($response);
+      $decoded_response = json_decode($response->getBody()->getContents());
+
       // If not an object we hit some unknown error.
       if (!is_object($decoded_response)) {
         $error_msg = "Unknown error getting data from Google Places API.";
         throw new RequestException($error_msg, 1);
       }
+
       // If status code is not OK or ZERO_RESULTS, we hit a defined Places API error
       if (!in_array($decoded_response->status, array('OK', 'ZERO_RESULTS'))) {
-        $error_msg = $decoded_response->status;
-        if (isset($decoded_response->error_message)) {
-          $error_msg .= ": {$decoded_response->error_message}";
-        }
+        $error_msg = strtr("Google responded with status: @status @error_mesage.", array(
+          '@status' => $decoded_response->status,
+          '@error_message' => isset($decoded_response->error_message) ? $decoded_response->error_message : ''
+        ));
         throw new RequestException($error_msg, 1);
       }
 
@@ -193,12 +187,12 @@ class Query implements QueryInterface {
   }
 
   /**
-   * Constructs the url for the request.
+   * Constructs the uri for the request.
    *
    * @return string
-   *   The url.
+   *   The uri.
    */
-  private function prepareUrl() {
+  private function prepareUri() {
     // Get the options for the request.
     $options = $this->options;
 
@@ -215,7 +209,7 @@ class Query implements QueryInterface {
     }
 
     // Add the parameters to the endpoint and return them.
-    return $this->endPoint . implode('&', $processed_parameters);
+    return 'json?' . implode('&', $processed_parameters);
   }
   
 }
