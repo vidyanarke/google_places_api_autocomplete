@@ -8,6 +8,6 @@ namespace Drupal\places_api_autocomplete\Exception;
  */
 
 /**
- * Provide a GooglePlacesAPIAutocomplete Exception class.
+ * Provide a RequestException Exception class.
  */
 class RequestException extends \Exception { }

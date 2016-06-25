@@ -4,5 +4,6 @@ package = Fields
 core = 7.x
 
 dependencies[] = xautoload
+dependencies[] = composer_manager
 
 configure = admin/config/services/places

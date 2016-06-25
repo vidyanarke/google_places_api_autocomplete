@@ -8,18 +8,13 @@ namespace Drupal\places_api_autocomplete\Query;
  */
 use Drupal\places_api_autocomplete\Cache\CacheInterface;
 use Drupal\places_api_autocomplete\Exception\RequestException;
+use Fig\Cache\Memory\MemoryPool;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Queries the Google Places API for autocomplete suggestions.
  */
 class Query implements QueryInterface {
-
-  /**
-   * The input from the user.
-   *
-   * @var string
-   */
-  protected $input;
 
   /**
    * The Google API key.
@@ -36,6 +31,13 @@ class Query implements QueryInterface {
   protected $endPoint = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?';
 
   /**
+   * The input from the user.
+   *
+   * @var string
+   */
+  protected $input;
+
+  /**
    * The options (parameters) for the request to the Places API.
    *
    * @var array
@@ -43,18 +45,11 @@ class Query implements QueryInterface {
   protected $options = array();
 
   /**
-   * Static cache for the requests.
+   * Cache services.
    *
-   * @var array
+   * @var CacheItemPoolInterface[]
    */
-  protected static $staticCache = array();
-
-  /**
-   * A cache service.
-   *
-   * @var PlacesApiAutocompleteCacheServiceInterface
-   */
-  protected $cache;
+  protected $caches;
 
   /**
    * The results of the query.
@@ -68,11 +63,20 @@ class Query implements QueryInterface {
    *
    * @param string $key
    *   The Google API key.
-   * @param \Drupal\places_api_autocomplete\Cache\CacheInterface $cache
+   * @param \Psr\Cache\CacheItemPoolInterface $cache
    */
-  public function __construct($key, CacheInterface $cache = NULL) {
+  public function __construct($key, CacheItemPoolInterface $cache = NULL) {
     $this->key = $key;
-    $this->cache = $cache;
+
+    // Use an in memory cache backend to store queries per request.
+    $this->caches = array(
+      new MemoryPool()
+    );
+
+    // If a permanent cache was provided, add it to the list of cache backends.
+    if ($cache) {
+      $this->caches []= $cache;
+    }
   }
 
   /**
@@ -99,23 +103,13 @@ class Query implements QueryInterface {
    *   The cached results, or NULL.
    */
   private function cacheGet() {
-    // Get the cid from the current input.
-    $cid = $this->getCid();
-
-    // First, try to find the cid in the static cache.
-    if (isset(self::$staticCache[$cid])) {
-      return self::$staticCache[$cid];
-    }
-
-    // Alternativly try to use the cache service we received at construction.
-    if ($this->cache) {
-      $cache = $this->cache->get($cid);
-
+    foreach ($this->caches as $cache) {
+      $item = $cache->getItem($this->getCid());
+      $data = $item->get();
       // If we found a cache value, validate the input is the same (to prevent
       // an hypotetical situation where 2 input strings have the same hash).
-      if (isset($cache) && !empty($cache) && $cache->input === $this->input) {
-        // Save the data in the static cache and return it.
-        return self::$staticCache[$cid] = $cache->data;
+      if ($item->isHit() && $data['input'] == $this->input ) {
+        return $data['value'];
       }
     }
   }
@@ -123,19 +117,19 @@ class Query implements QueryInterface {
   /**
    * Stores a value in the cache.
    *
-   * @param mixed $data
+   * @param mixed $value
    *   The value to be stored.
    */
-  private function cacheSet($data) {
-    $cid = $this->getCid();
+  private function cacheSet($value) {
+    $data = array(
+      'input' => $this->input,
+      'value' => $value
+    );
 
-    if ($this->cache) {
-      $cache = new \StdClass();
-      $cache->data = $data;
-      // Add the input to the cache object, this allows validation on it at
-      // retrieval.
-      $cache->input = $this->input;
-      $this->cache->set($cid, $cache);
+    foreach ($this->caches as $cache) {
+      $cache_item = $cache->getItem($this->getCid());
+      $cache_item->set($data);
+      $cache->save($cache_item);
     }
   }
 
@@ -146,7 +140,7 @@ class Query implements QueryInterface {
    *   The cid
    */
   private function getCid() {
-    return 'hash-' . md5($this->input);
+    return 'hash.' . md5($this->input);
   }
 
   /**

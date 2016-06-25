@@ -3,6 +3,7 @@
 namespace Drupal\places_api_autocomplete\Query;
 
 use Drupal\places_api_autocomplete\Cache\CacheDrupal;
+use Drupal\places_api_autocomplete\Cache\DrupalCachePool;
 
 /**
  * @file
@@ -20,7 +21,7 @@ class QueryFactory implements QueryFactoryInterface {
   public static function construct() {
     return new Query(
       static::getKey(),
-      new CacheDrupal()
+      new DrupalCachePool('cache_places')
     );
   }
 
