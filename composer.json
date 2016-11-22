@@ -5,8 +5,9 @@
     "homepage": "https://www.drupal.org/project/google_places_api_autocomplete",
     "keywords": ["Drupal"],
     "require": {
-        "fig/cache-util": "^1.0@dev",
-        "guzzlehttp/guzzle": "^6.2.1"
+        "guzzlehttp/guzzle": "^6.2.1",
+        "calin-marian/place-autocomplete": "^1.0",
+        "calin-marian/drupal7-psr6-cache-wrapper": "^0.1.0"
     },
     "license": "GPL-2.0+",
     "authors": [

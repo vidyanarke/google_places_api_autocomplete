@@ -5,8 +5,11 @@
  * Google Places API autocomplete module.
  */
 
-use Drupal\places_api_autocomplete\Exception\RequestException;
-use Drupal\places_api_autocomplete\Query\QueryFactory;
+use DrupalPsr\Cache\Pool;
+use GooglePlaceAutocomplete\Exception\RequestException;
+use GooglePlaceAutocomplete\Parameter\PlaceType;
+use GooglePlaceAutocomplete\Request\Request;
+use GoogleSupportedLanguages\LanguageFactory;
 
 /**
  * Implements hook_menu().
@@ -72,18 +75,18 @@ function places_api_autocomplete($field_name = 'global', $entity_type = NULL, $b
 
   // Add the active language as a parameter to get the results in the site's
   // active language.
-  $options['language'] = $language->language;
+  if (empty($options['language'])) {
+    $options['language'] = $language->language;
+  }
 
   if ($string && strlen($string) >= $options['minlength']) {
-    $query = QueryFactory::construct()->query($string, $options);
-    
     try {
       // Perform the actual search.
-      $places = $query->execute();
+      $response = places_api_autocomplete_execute($string, $options);
 
       // Map the results in the format drupal autocomplete API needs it.
-      foreach ($places as $place) {
-        $matches[$place->description] = check_plain($place->description);
+      foreach ($response as $prediction) {
+        $matches[$prediction->getDescription()] = check_plain($prediction->getDescription());
       }
     }
     catch (RequestException $e) {
@@ -94,6 +97,59 @@ function places_api_autocomplete($field_name = 'global', $entity_type = NULL, $b
 
   // Return the matches in json format, and stop the page execution.
   drupal_json_output($matches);
+}
+
+/**
+ * @param string $input
+ * @param array $options
+ * @return \GooglePlaceAutocomplete\Response\Response|void
+ * @throws \GooglePlaceAutocomplete\Exception\RequestException
+ */
+function places_api_autocomplete_execute($input, $options) {
+  $key = variable_get('places_api_autocomplete_key', NULL);
+  if (!$key) {
+    return;
+  }
+
+  $cache_pool = new Pool($bin = 'cache');
+
+  $request = new Request($key, $cache_pool);
+
+  if (!empty($options['offset'])) {
+    $request->setOffset((int) $options['offset']);
+  }
+
+  if (!empty($options['location'])) {
+    list($lat, $lng) = explode(',', $options['location']);
+    $location = new \GooglePlaceAutocomplete\Parameter\Location($lat, $lng);
+    $request->setLocation($location);
+  }
+
+  if (!empty($options['radius'])) {
+    $request->setRadius((int) $options['radius']);
+  }
+
+  if (!empty($options['language'])) {
+    $languageFactory = new LanguageFactory();
+    $language_parameter = $languageFactory->create($options['language']);
+    $request->setLanguage($language_parameter);
+  }
+
+  if (!empty($options['type'])) {
+    $type = new PlaceType($options['type']);
+    $request->setTypes($type);
+  }
+
+  if (!empty($options['components'])) {
+    list ($type, $value) = explode(':', $options['components']);
+    if ($type == 'country') {
+      $country = new \Markenwerk\Iso3166Country\Iso3166Country($value);
+      $component = new \GooglePlaceAutocomplete\Component\Country($country);
+      $request->setComponents($component);
+    }
+  }
+
+  return $request->execute();
 }
 
 /**
