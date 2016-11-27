@@ -6,10 +6,15 @@
  */
 
 use DrupalPsr\Cache\Pool;
+use GooglePlaceAutocomplete\Component\Country;
 use GooglePlaceAutocomplete\Exception\RequestException;
+use GooglePlaceAutocomplete\Parameter\Components;
+use GooglePlaceAutocomplete\Parameter\Language;
+use GooglePlaceAutocomplete\Parameter\Location;
 use GooglePlaceAutocomplete\Parameter\PlaceType;
 use GooglePlaceAutocomplete\Request\Request;
 use GoogleSupportedLanguages\LanguageFactory;
+use Markenwerk\Iso3166Country\Iso3166Country;
 
 /**
  * Implements hook_menu().
@@ -114,6 +119,7 @@ function places_api_autocomplete_execute($input, $options) {
   $cache_pool = new Pool($bin = 'cache');
 
   $request = new Request($key, $cache_pool);
+  $request->setInput($input);
 
   if (!empty($options['offset'])) {
     $request->setOffset((int) $options['offset']);
@@ -121,7 +127,7 @@ function places_api_autocomplete_execute($input, $options) {
 
   if (!empty($options['location'])) {
     list($lat, $lng) = explode(',', $options['location']);
-    $location = new \GooglePlaceAutocomplete\Parameter\Location($lat, $lng);
+    $location = new Location($lat, $lng);
     $request->setLocation($location);
   }
 
@@ -131,7 +137,8 @@ function places_api_autocomplete_execute($input, $options) {
 
   if (!empty($options['language'])) {
     $languageFactory = new LanguageFactory();
-    $language_parameter = $languageFactory->create($options['language']);
+    $language = $languageFactory->create($options['language']);
+    $language_parameter = new Language($language);
     $request->setLanguage($language_parameter);
   }
 
@@ -143,9 +150,12 @@ function places_api_autocomplete_execute($input, $options) {
   if (!empty($options['components'])) {
     list ($type, $value) = explode(':', $options['components']);
     if ($type == 'country') {
-      $country = new \Markenwerk\Iso3166Country\Iso3166Country($value);
-      $component = new \GooglePlaceAutocomplete\Component\Country($country);
-      $request->setComponents($component);
+      $country = new Iso3166Country();
+      $country->loadByIso3166Alpha2Code($value);
+      $component = new Country($country);
+      $components = new Components();
+      $components->addComponent($component);
+      $request->setComponents($components);
     }
   }
 
