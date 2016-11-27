@@ -14,7 +14,7 @@ use GooglePlaceAutocomplete\Parameter\Location;
 use GooglePlaceAutocomplete\Parameter\PlaceType;
 use GooglePlaceAutocomplete\Request\Request;
 use GoogleSupportedLanguages\LanguageFactory;
-use Markenwerk\Iso3166Country\Iso3166Country;
+use Markenwerk\Iso3166Country\Iso3166CountryInformation;
 
 /**
  * Implements hook_menu().
@@ -150,8 +150,7 @@ function places_api_autocomplete_execute($input, $options) {
   if (!empty($options['components'])) {
     list ($type, $value) = explode(':', $options['components']);
     if ($type == 'country') {
-      $country = new Iso3166Country();
-      $country->loadByIso3166Alpha2Code($value);
+      $country = Iso3166CountryInformation::getByIso3166Alpha2($value);
       $component = new Country($country);
       $components = new Components();
       $components->addComponent($component);
