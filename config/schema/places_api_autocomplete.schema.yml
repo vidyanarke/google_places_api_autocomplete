@@ -1,0 +1,24 @@
+# Schema for the configuration of the Google places API autocomplete module.
+
+field.widget.settings.places_autocomplete:
+  type: mapping
+  label: 'Link format settings'
+  mapping:
+    offset:
+      type: string
+      label: 'Placeholder for URL'
+    location:
+      type: string
+      label: 'Placeholder for location'
+    radius:
+      type: string
+      label: 'Placeholder for radius'
+    language:
+      type: string
+      label: 'Placeholder for language'
+    types:
+      type: string
+      label: 'Placeholder for types'
+    components:
+      type: string
+      label: 'Placeholder for components'

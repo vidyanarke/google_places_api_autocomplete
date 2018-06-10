@@ -1,0 +1,14 @@
+places_api_autocomplete.core_content:
+  title: 'Google autocomplete places Api'
+  description: 'Google API for autocomplete places'
+  parent: system.admin_config_development
+  route_name: places_api_autocomplete.core_content
+  weight: 100
+
+
+places_api_autocomplete.admin:
+  title: 'Google autocomplete places Api'
+  description: 'Google API for autocomplete places'
+  parent: system.admin_config_development
+  route_name: places_api_autocomplete.admin
+  weight: 100

@@ -1,0 +1,10 @@
+name: Google Places API autocomplete
+type: module
+description: Provides an autocomplete path integrated with Google Places API.
+
+package: Fields
+
+version: "8.x-1.0"
+core: "8.x"
+project: "google_places_api_autocomplete"
+

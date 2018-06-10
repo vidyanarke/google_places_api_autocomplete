@@ -6,7 +6,9 @@ implementation.
 
 # How to use the module
 1. The module exposes a widget for text fields.
-2. Set the Google Places Autocomplete widget for the text field you want.
+1. Go to form display configuration of the content type.
+2. Select "Google places autocomplete" in widget column for this new field.
+3. Add appropriate autocomplete settings for the field.
 3. When typing into the text field, you can see suggestions based on the
 characters you typed.
 

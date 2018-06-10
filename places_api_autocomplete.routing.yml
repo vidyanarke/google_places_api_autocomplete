@@ -1,0 +1,27 @@
+places_api_autocomplete.core_content:
+  path: '/places/autocomplete'
+  defaults:
+    _controller: '\Drupal\places_api_autocomplete\Controller\PlacesController::content'
+    _title: 'Google Places API autocomplete'
+  requirements:
+    _permission: 'access content'
+
+places_api_autocomplete.content:
+  path: '/places/autocomplete/{entity_type}/{field_name}/{bundle}'
+  defaults:
+    _controller: '\Drupal\places_api_autocomplete\Controller\PlacesController::content'
+    _title: 'Google Places API autocomplete'
+  requirements:
+    _permission: 'access content'
+
+places_api_autocomplete.admin:
+  path: '/admin/config/services/places'
+  defaults:
+    _form: '\Drupal\places_api_autocomplete\Form\PlacesAdminForm'
+    _title: 'Google Places API autocomplete Settings'
+  requirements:
+    _permission: 'administer site configuration'
+
+
+
+
