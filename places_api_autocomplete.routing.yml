@@ -21,7 +21,3 @@ places_api_autocomplete.admin:
     _title: 'Google Places API autocomplete Settings'
   requirements:
     _permission: 'administer site configuration'
-
-
-
-
