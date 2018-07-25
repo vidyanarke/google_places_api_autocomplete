@@ -1,17 +1,24 @@
 <?php
 
 /**
+ * @file
  * Generic function called to get default places autocomplete options.
  */
 
-  	function places_autocomplete_default_options() {
-		return array(
-		    'offset' => '',
-		    'location' => '',
-		    'radius' => '',
-		    'language' => '',
-		    'types' => '',
-		    'components' => '',
-		    'minlength' => '',
-		);
-	}
+/**
+ * Default options for autocomplete results.
+ *
+ * @return array
+ *   Array of default configurations.
+ */
+function places_autocomplete_default_options() {
+  return [
+    'offset' => '',
+    'location' => '',
+    'radius' => '',
+    'language' => '',
+    'types' => '',
+    'components' => '',
+    'minlength' => '',
+  ];
+}

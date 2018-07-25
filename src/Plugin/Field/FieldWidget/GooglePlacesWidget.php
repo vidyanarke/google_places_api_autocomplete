@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\places_api_autocomplete\Plugin\Field\FieldWidget;
 
 
@@ -32,9 +33,10 @@ class GooglePlacesWidget extends WidgetBase implements ContainerFactoryPluginInt
    * {@inheritdoc}
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entityTypeManager) {
-      parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
-      $this->entityTypeManager = $entityTypeManager;
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
+    $this->entityTypeManager = $entityTypeManager;
   }
+
   /**
    * Creates an instance of the plugin.
    *
@@ -78,11 +80,11 @@ class GooglePlacesWidget extends WidgetBase implements ContainerFactoryPluginInt
       '#size' => 60,
       '#maxlength' => 255,
       '#autocomplete_route_name' => 'places_api_autocomplete.content',
-      '#autocomplete_route_parameters' => array(
+      '#autocomplete_route_parameters' => [
         'entity_type' => $entity_type,
         'field_name' => $field_name,
-        'bundle' => $bundle_name
-      ),
+        'bundle' => $bundle_name,
+      ],
     ];
 
     return $element;
@@ -137,6 +139,7 @@ class GooglePlacesWidget extends WidgetBase implements ContainerFactoryPluginInt
     //kint($elements);
     return $elements;
   }
+
   /**
    * {@inheritdoc}
    */
@@ -150,6 +153,7 @@ class GooglePlacesWidget extends WidgetBase implements ContainerFactoryPluginInt
     $summary[] = $this->t('Components: @components', ['@components' => $this->getSetting('components')]);
     return $summary;
   }
+
   /**
    * {@inheritdoc}
    */

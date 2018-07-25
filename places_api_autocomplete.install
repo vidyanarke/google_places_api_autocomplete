@@ -19,12 +19,15 @@ function places_api_autocomplete_schema() {
  * Implements hook_install().
  */
 function places_api_autocomplete_install() {
- // $link = \Drupal::l('Administration > Configuration > Web Services > Google Places API', 'admin/config/services/places');
- // $message = format_string("Google Places API settings are available under !link", array('!link' => $link));
+  // $link = \Drupal::l('Administration > Configuration > Web Services > Google Places API', 'admin/config/services/places');
+  // $message = format_string("Google Places API settings are available under !link", array('!link' => $link));
   // Provide a link to module settings.
 
   // Set documentation link.
-  \Drupal::service('config.factory')->getEditable('places.settings')->set('places_api_autocomplete_documentation_link', 'https://developers.google.com/places/documentation/autocomplete#place_autocomplete_requests')->save();
+  \Drupal::service('config.factory')
+    ->getEditable('places.settings')
+    ->set('places_api_autocomplete_documentation_link', 'https://developers.google.com/places/documentation/autocomplete#place_autocomplete_requests')
+    ->save();
 }
 
 /**
