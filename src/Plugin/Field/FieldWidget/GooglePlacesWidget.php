@@ -3,6 +3,7 @@
 namespace Drupal\places_api_autocomplete\Plugin\Field\FieldWidget;
 
 
+use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
